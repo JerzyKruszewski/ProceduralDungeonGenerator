@@ -15,45 +15,40 @@ package me.jurij.ProceduralDungeonGenerator.Handlers;
 From: http://roguebasin.roguelikedevelopment.org/index.php?title=Dungeon-Building_Algorithm
  */
 
+import me.jurij.ProceduralDungeonGenerator.Objects.Dungeon;
 import me.jurij.ProceduralDungeonGenerator.Objects.Point;
+import me.jurij.ProceduralDungeonGenerator.Objects.Room;
 
 import java.util.Random;
 
 public class DungeonHandler
 {
-    private Integer seed = null;
-    private int width;
-    private int height;
-    private int minRoomWidth = 5;
-    private int minRoomHeight = 5;
-    private int maxRoomWidth = 5;
-    private int maxRoomHeight = 5;
     private Random random;
-    private char[][] dungeon;
+    private Integer seed = null;
+    private Dungeon dungeon;
 
-    public DungeonHandler(int width, int height)
+    public DungeonHandler(int width, int height, int numberOfRooms)
     {
-        this.width = width * 16;
-        this.height = height * 16;
+        this.dungeon = new Dungeon(width, height, numberOfRooms);
     }
 
-    public DungeonHandler(int width, int height, int seed)
+    public DungeonHandler(int width, int height, int numberOfRooms, int seed)
     {
-        this(width, height);
+        this(width, height, numberOfRooms);
         this.seed = seed;
     }
 
     public char[][] generateDungeon()
     {
+        char[][] map;
+
         initRandom();
 
-        //1.
-        initDungeon();
-
         //2.
-        createRoom(new Point(width/2, height/2));
+        map = addRoom(new Point(dungeon.getWidth()/2, dungeon.getHeight()/2));
 
-        return dungeon;
+        dungeon.setDungeonMap(map);
+        return dungeon.getDungeonMap();
     }
 
     private void initRandom()
@@ -68,57 +63,15 @@ public class DungeonHandler
         }
     }
 
-    private char[][] initDungeon()
+    private char[][] addRoom(Point cordinates)
     {
-        dungeon = new char[height][width];
+        Room room = new Room(cordinates, dungeon, random);
 
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
-            {
-                dungeon[y][x] = 'X';
-            }
-        }
-
-        return dungeon;
+        return room.createRoom();
     }
 
-    private char[][] createRoom(Point cordinates)
+    private char[][] addRoom()
     {
-        checkAndInitializeCords(cordinates);
-
-        int roomWidth = random.nextInt(maxRoomWidth - minRoomWidth + 1) + minRoomWidth;
-        int roomHeight = random.nextInt(maxRoomHeight - minRoomHeight + 1) + minRoomHeight;
-
-        for (int y = cordinates.getY(); y < cordinates.getY() + roomHeight; y++)
-        {
-            for (int x = cordinates.getX(); x < cordinates.getX() + roomWidth; x++)
-            {
-                dungeon[y][x] = '.';
-            }
-        }
-
-        return dungeon;
-    }
-
-    private char[][] createRoom()
-    {
-        return createRoom(new Point(-1, -1));
-    }
-
-    private void checkAndInitializeCords(Point cordinates)
-    {
-        int x = cordinates.getX();
-        int y = cordinates.getY();
-
-        if (x < 0  || x >= width - maxRoomWidth)
-        {
-            cordinates.setX(random.nextInt(width - maxRoomWidth));
-        }
-
-        if (y < 0 || y >= height - maxRoomHeight)
-        {
-            cordinates.setY(random.nextInt(height - maxRoomHeight/2));
-        }
+        return addRoom(new Point(-1, -1));
     }
 }
