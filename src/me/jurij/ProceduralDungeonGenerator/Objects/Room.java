@@ -4,9 +4,9 @@ import java.util.*;
 
 public class Room
 {
-    private int minRoomWidth = 5;
-    private int minRoomHeight = 5;
-    private int maxRoomWidth = 5;
+    private int minRoomWidth = 4;
+    private int minRoomHeight = 3;
+    private int maxRoomWidth = 7;
     private int maxRoomHeight = 5;
     private char roomIndicator = '.';
 
@@ -29,17 +29,18 @@ public class Room
 
     private void checkAndInitializeCords()
     {
-        int x = this.anchorPoint.getX();
-        int y = this.anchorPoint.getY();
+        int x = anchorPoint.getX();
+        int y = anchorPoint.getY();
 
+        //check if room will fit inside a dungeon
         if (x < 0  || x >= dungeon.getWidth() - maxRoomWidth)
         {
-            this.anchorPoint.setX(random.nextInt(dungeon.getWidth() - maxRoomWidth));
+            anchorPoint.setX(random.nextInt(dungeon.getWidth() - maxRoomWidth));
         }
 
         if (y < 0 || y >= dungeon.getHeight() - maxRoomHeight)
         {
-            this.anchorPoint.setY(random.nextInt(dungeon.getHeight() - maxRoomHeight/2));
+            anchorPoint.setY(random.nextInt(dungeon.getHeight() - maxRoomHeight));
         }
     }
 
@@ -47,17 +48,29 @@ public class Room
     {
         checkAndInitializeCords();
 
+        //create random size of the room
         this.roomWidth = random.nextInt(maxRoomWidth - minRoomWidth + 1) + minRoomWidth;
         this.roomHeight = random.nextInt(maxRoomHeight - minRoomHeight + 1) + minRoomHeight;
 
         char[][] map = dungeon.getDungeonMap();
 
-        for (int y = this.anchorPoint.getY(); y < this.anchorPoint.getY() + this.roomHeight; y++)
+        walls[0] = new Wall(false, roomWidth, anchorPoint);
+        walls[1] = new Wall(true, roomHeight, anchorPoint);
+        walls[2] = new Wall(false, roomWidth + 1, new Point(anchorPoint.getX(), anchorPoint.getY() + roomHeight)); //I don't know why +1, but without it it can break.
+        walls[3] = new Wall(true, roomHeight, new Point(anchorPoint.getX() + roomWidth, anchorPoint.getY()));
+
+        //add room to map
+        for (int y = anchorPoint.getY(); y < anchorPoint.getY() + roomHeight; y++)
         {
-            for (int x = this.anchorPoint.getX(); x < this.anchorPoint.getX() + this.roomWidth; x++)
+            for (int x = anchorPoint.getX(); x < anchorPoint.getX() + roomWidth; x++)
             {
-                map[y][x] = this.roomIndicator;
+                map[y][x] = roomIndicator;
             }
+        }
+
+        for (Wall wall : walls)
+        {
+            wall.drawWall(map);
         }
 
         return map;

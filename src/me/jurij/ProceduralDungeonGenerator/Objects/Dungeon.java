@@ -35,16 +35,16 @@ public class Dungeon
 
     public void setDungeonMap(char[][] map)
     {
-        this.dungeonMap = map;
+        dungeonMap = map;
     }
 
     private void initDungeon()
     {
-        for (int y = 0; y < this.height; y++)
+        for (int y = 0; y < height; y++)
         {
-            for (int x = 0; x < this.width; x++)
+            for (int x = 0; x < width; x++)
             {
-                this.dungeonMap[y][x] = this.dungeonIndicator;
+                dungeonMap[y][x] = dungeonIndicator;
             }
         }
     }
